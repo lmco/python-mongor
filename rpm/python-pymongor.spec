@@ -12,7 +12,7 @@ Version: %{version}
 Release: %{release}
 Source0: %{name}-%{unmangled_version}.tar.gz
 Source1: rotate_mongodb.cron
-License: UNKNOWN
+License: MIT
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
@@ -20,7 +20,7 @@ BuildArch: noarch
 Vendor: Daniel Bauman <Daniel.Bauman@lmco.com>
 Requires: python python-pymongo mongodb mongodb-server python-dateutil 
 %description
-UNKNOWN
+Distributed database expansion to MongoDB designed to optimize scale-out, write intensive document storage
 
 %prep
 cp -fp %{SOURCE1} ./

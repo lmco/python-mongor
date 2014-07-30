@@ -165,6 +165,13 @@ class Config(object):
         self.database['nodes'].insert(node)
         return self.get_node(uid)
     
+    def set_node_tags(self, uid, db_tags):
+        nodes = self.get_node(uid)
+        if isinstance(db_tags, list):
+            for node in nodes:
+                node['db_tags']  = db_tags
+                self.database['nodes'].save(node)
+                
     def rotate_schedule(self, db_type=""):
         '''
         assumes that appropriate maintenence has already been done 
@@ -218,8 +225,28 @@ class Config(object):
             node['host'] = self.mongo_client.host #ensure all node hosts are relative to the caller.
         return nodes
         
-    def remove_node(self, uid):
+    def remove_node(self, db_type, uid):
+        '''removes the nodes from the rotation
+        this has a giant atomicity problem
+        any command seeking to read from the database inluding:
+            get the current node
+            rotate the schedule
+            add/delete other nodes
+        during this command may have uncontrolled output
+        
+        It would be best to lock all applications from accessing mongor 
+        while this command takes place
+        '''
+        delete_nodes = self.get_node(uid)
         self.database['nodes'].remove({"uid":uid})
+        for node in delete_nodes:
+            self.database.connection.drop_database(node['name'])
+        nodes_to_reorder = self.get_write_nodes(db_type = db_type)
+        schedule = 0
+        for node in nodes_to_reorder:
+            node['schedule'] = schedule
+            schedule += 1
+            self.database['nodes'].save(node)
         return self.get_node(uid)
 
     def _get_next_sequence_number(self, db_type=""):

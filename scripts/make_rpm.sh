@@ -17,7 +17,9 @@ echo '%_topdir %(echo $HOME)/rpmbuild' > ~/.rpmmacros
 echo 'Copying source files to rpmbuild directory'
 cp dist/*.tar.gz ~/rpmbuild/SOURCES/
 cp rpm/rotate_mongodb.cron ~/rpmbuild/SOURCES/
+cp scripts/mongor_manage.py ~/rpmbuild/SOURCES/
 cp rpm/$SPEC_FILE ~/rpmbuild/SPECS/
+ 
 
 echo 'Making RPM'
 cd ~/rpmbuild/SPECS/

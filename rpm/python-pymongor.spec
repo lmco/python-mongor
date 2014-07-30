@@ -5,13 +5,14 @@
 %define version 0.3
 %define unmangled_version 0.3
 %define unmangled_version 0.3
-%define release 9 
+%define release 10
 Summary: A utility to curate mongo databases
 Name: %{name}
 Version: %{version}
 Release: %{release}
 Source0: %{name}-%{unmangled_version}.tar.gz
 Source1: rotate_mongodb.cron
+Source2: mongor_manage.py
 License: MIT
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
@@ -24,6 +25,7 @@ Distributed database expansion to MongoDB designed to optimize scale-out, write 
 
 %prep
 cp -fp %{SOURCE1} ./
+cp -fp %{SOURCE2} ./
 %setup -n %{name}-%{unmangled_version} -n %{name}-%{unmangled_version}
 
 %build
@@ -36,11 +38,14 @@ mkdir -p $RPM_BUILD_ROOT/etc/cron.d
 install -m 755 -p $RPM_BUILD_DIR/rotate_mongodb.cron \
         $RPM_BUILD_ROOT/etc/cron.d/rotate_mongodb.cron
 
-
+mkdir -p $RPM_BUILD_ROOT/usr/bin/
+install -m 555 -p $RPM_BUILD_DIR/mongor_manage.py \
+        $RPM_BUILD_ROOT/usr/bin/mongor_manage
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files -f INSTALLED_FILES
 %defattr(0644,root,root)
+%attr(555, root, root) /usr/bin/mongor_manage
 %config(noreplace) /etc/cron.d/rotate_mongodb.cron

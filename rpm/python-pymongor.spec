@@ -5,7 +5,7 @@
 %define version 0.3
 %define unmangled_version 0.3
 %define unmangled_version 0.3
-%define release 10
+%define release 12
 Summary: A utility to curate mongo databases
 Name: %{name}
 Version: %{version}

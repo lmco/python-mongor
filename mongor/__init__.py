@@ -462,7 +462,7 @@ class GlobalQuery:
         self.load_remote_configs(db_type, db_tags=db_tags)
     
     def load_remote_configs(self, db_type, db_tags):
-        config_servers = self.local_config.get_nodes({ "db_tags": { '$all': db_tags }})
+        config_servers = self.local_config.get_nodes({"db_tags": { '$in': db_tags }})
         for node in config_servers:
             node_name = "%s:%s" %(node['host'], node['port'])
             self.remote_databases[node_name] = []
@@ -478,7 +478,13 @@ class GlobalQuery:
             node_databases = []
             for remote_read_node in self.remote_configs[node_name].get_read_nodes(db_type):
                 remote_read_node['host'] = node['host']
-                node_databases.append(database.node_to_database(remote_read_node))
+                try:
+                    node_databases.append(database.node_to_database(remote_read_node))
+                except pymongo.errors.ConnectionFailure:
+                    #can connect to config but not data
+                    #you get here if you colocate a edge node 
+                    #with the central server.  Gracefully allow this to pass 
+                    pass 
             if node_databases:
                 self.remote_databases[node_name] = Query(databases=node_databases)
         return self

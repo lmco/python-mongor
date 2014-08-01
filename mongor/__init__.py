@@ -6,32 +6,7 @@ import datetime
 #needed external deps
 import pymongo
 from pymongo.errors import CollectionInvalid
-from pymongo.errors import ConnectionFailure 
-from dateutil.parser import parse
 import bson
-
-
-#utilities
-def datetime_to_ObjectId(dt_object=None):
-    '''
-    giving this function an obvious name
-    '''
-    return bson.objectid.ObjectId.from_datetime(dt_object)
-
-def string_datetime_to_ObjectId(string_dt_object):
-    '''
-    giving this function an obvious name
-    '''
-    return datetime_to_ObjectId(parse(string_dt_object))
-
-def string_ObjectId_to_datetime(string_ObjectId_object):
-    '''
-    giving this function an obvious name
-    '''
-    return bson.objectid.ObjectId(string_ObjectId_object).generation_time
-
-
-
 
 class Config(object):
     """
@@ -281,6 +256,7 @@ class Maintenence:
                             db_type=""):
         assert isinstance(indexes, list)
         for node in self.config.get_write_nodes(db_type=db_type):
+            node['host'] = self.config.mongo_client.host
             database = Database().node_to_database(node)
             for index in indexes:
                 database[collection].ensure_index(index['field'], 
@@ -470,7 +446,7 @@ class GlobalQuery:
                 self.remote_configs[node_name] = Config(host=node['host'], 
                                                         port=node['port'], 
                                                         ssl=node['ssl'])
-            except ConnectionFailure:
+            except pymongo.errors.ConnectionFailure:
                 self.remote_databases[node_name] = None
                 continue #move to the next possible node
             

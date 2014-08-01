@@ -4,8 +4,16 @@
 from mongor import Maintenence
 import argparse
 from pprint import pprint
-from bson.json_util import loads
+from bson.json_util import loads, dumps
 from distutils.util import strtobool
+
+def list_nodes(args):
+    m = Maintenence(args.config_host, args.config_port, args.config_ssl)
+    nodes = m.config.get_nodes({})
+    for node in nodes:
+        del(node["_id"])
+        print dumps(node)
+    return
 
 def add_node(args):
     m = Maintenence(args.config_host, args.config_port, args.config_ssl)
@@ -32,7 +40,6 @@ def set_db_tags(args):
     m.config.set_node_tags(args.uid,
                     tags)
     return
-
 
 def add_index(args):
     m = Maintenence(args.config_host, args.config_port, args.config_ssl)
@@ -68,7 +75,7 @@ if __name__ == '__main__':
     parser.add_argument('--host', type=str, dest='config_host', required=True)
     parser.add_argument('--port', type=int, dest='config_port', required=True)
     parser.add_argument('--ssl', dest='config_ssl', default=False, action='store_true')
-    parser.add_argument('--listnodes', dest='list_nodes', default=False, action='store_true')
+    
     
     
     subparsers = parser.add_subparsers(help='python manage.py <command> -h')
@@ -125,10 +132,13 @@ if __name__ == '__main__':
     parser_set_db_tags.add_argument('db_tags', type=str, help="JSON list of namespaces")
     
     
-    
+    parser_list_nodes = subparsers.add_parser('listnodes', help='list the current mongor configuration')
+    parser_list_nodes.set_defaults(which='listnodes')
     
     args = parser.parse_args()
-    if args.which is "addnode":
+    if args.which is "listnodes":
+        list_nodes(args)
+    elif args.which is "addnode":
         add_node(args)
     elif args.which is "removenode":
         remove_node(args)

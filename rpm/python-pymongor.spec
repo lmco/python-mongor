@@ -5,7 +5,7 @@
 %define version 0.3
 %define unmangled_version 0.3
 %define unmangled_version 0.3
-%define release 12
+%define release 15
 Summary: A utility to curate mongo databases
 Name: %{name}
 Version: %{version}
@@ -19,9 +19,39 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
 BuildArch: noarch
 Vendor: Daniel Bauman <Daniel.Bauman@lmco.com>
-Requires: python python-pymongo mongodb mongodb-server python-dateutil 
+Requires: python python-pymongo mongodb mongodb-server python-bson
 %description
 Distributed database expansion to MongoDB designed to optimize scale-out, write intensive document storage
+
+
+%package manager
+Summary: Manager commands for the mongor
+Requires: python-argparse python-pymongor
+
+%description manager
+Provides 
+usage: MongoR manager [-h] --host CONFIG_HOST --port CONFIG_PORT [--ssl]
+
+                      {addnode,removenode,removeindex,addindex,listnodes,setdbtags,buildindex}
+                      ...
+
+positional arguments:
+  {addnode,removenode,removeindex,addindex,listnodes,setdbtags,buildindex}
+                        python manage.py <command> -h
+    addnode             adds a node to mongor
+    removenode          removes a node to mongor
+    addindex            adds an index to mongor
+    removeindex         removes index from future built buckets
+    buildindex          build the index on all databases
+    setdbtags           sets the db_tags field for an existing node
+    listnodes           list the current mongor configuration
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --host CONFIG_HOST
+  --port CONFIG_PORT
+  --ssl
+
 
 %prep
 cp -fp %{SOURCE1} ./
@@ -47,5 +77,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -f INSTALLED_FILES
 %defattr(0644,root,root)
-%attr(555, root, root) /usr/bin/mongor_manage
 %config(noreplace) /etc/cron.d/rotate_mongodb.cron
+%files manager
+%attr(500, root, root) /usr/bin/mongor_manage
+

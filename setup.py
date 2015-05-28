@@ -7,7 +7,7 @@ setup(
     maintainer = "Daniel Bauman",
     maintainer_email = "Daniel.Bauman@lmco.com",
     description = ("A utility to curate mongo databases"),
-    license = "",
+    license = "MIT",
     keywords = "",
     url = "",
     install_requires = ["pymongo>=3.0"],
